@@ -90,16 +90,44 @@ public class Intersect {
     return list;
   }
 
-  static List<Integer> intersect(Iterator<Posting> p1, Iterator<Posting> p2) {
+  static List<Integer> intersectSimple(Iterator<Posting> p1, Iterator<Posting> p2) {
     List<Integer> answer = new ArrayList<>();
-
-    // WRITE ALGORITHM HERE
     List<Integer> l1 = listFromIterator(p1);
     List<Integer> l2 = listFromIterator(p2);
     answer.addAll(l1);
     answer.retainAll(l2);
-
     return answer;
+  }
+  static List<Integer> intersectAdvanced(Iterator<Posting> p1, Iterator<Posting> p2) {
+    List<Integer> answer = new ArrayList<>();
+    Posting pp1 = popNextOrNull(p1);
+    Posting pp2 = popNextOrNull(p2);
+
+    while(pp1 != null && pp2 != null) {
+      if(pp1.docID == pp2.docID) {
+        answer.add(pp1.docID);
+        pp1 = popNextOrNull(p1);
+        pp2 = popNextOrNull(p2);
+      } else {
+        if (pp1.docID < pp2.docID) {
+          pp1 = popNextOrNull(p1);
+        } else {
+          pp2 = popNextOrNull(p2);
+        }
+      }
+    }
+    return answer;
+  }
+
+  static List<Integer> intersect(Iterator<Posting> p1, Iterator<Posting> p2) {
+
+    // WRITE ALGORITHM HER
+//  O(n) solution
+    return intersectAdvanced(p1, p2);
+//  O (n^2) Solution
+//    return intersectSimple(p1, p2);
+
+
   }
 
   /** Load a single postings list: Information about where a single token
