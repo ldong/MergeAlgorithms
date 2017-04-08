@@ -81,13 +81,23 @@ public class Intersect {
     }
   }
 
+  static List<Integer> listFromIterator(Iterator<Posting> iter) {
+    List<Integer> list = new ArrayList<>();
+    Posting p;
+    while ((p = popNextOrNull(iter)) != null) {
+      list.add(p.docID);
+    }
+    return list;
+  }
+
   static List<Integer> intersect(Iterator<Posting> p1, Iterator<Posting> p2) {
     List<Integer> answer = new ArrayList<>();
 
-    Posting pp1 = popNextOrNull(p1);
-    Posting pp2 = popNextOrNull(p2);
-
     // WRITE ALGORITHM HERE
+    List<Integer> l1 = listFromIterator(p1);
+    List<Integer> l2 = listFromIterator(p2);
+    answer.addAll(l1);
+    answer.retainAll(l2);
 
     return answer;
   }
