@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -80,19 +81,62 @@ public class PositionalWithinK {
       return null;
     }
   }
+  static List<AnswerElement> intersectAdvanced(Iterator<Posting> p1, Iterator<Posting> p2, int k) {
+    List<AnswerElement> answer = new ArrayList<>();
+    Posting pp1 = popNextOrNull(p1);
+    Posting pp2 = popNextOrNull(p2);
 
+    // Just carefully translate the pseudo code from ch2
+    // POSITIONAL INTERSECT (p1, p2, k) into Java Code :)
+    while(pp1 != null && pp2 != null) {
+      if(pp1.docID == pp2.docID) {
+        LinkedList<Integer> pp2posList = new LinkedList<>();
+
+        Iterator<Integer> pp1poses = pp1.positions();
+        Iterator<Integer> pp2poses = pp2.positions();
+
+        Integer pp1pos = popNextOrNull(pp1poses);
+        Integer pp2pos = popNextOrNull(pp2poses);
+
+        while (pp1pos != null) {
+          while (pp2pos != null) {
+            if (Math.abs(pp1pos - pp2pos) <= k) {
+              pp2posList.add(pp2pos);
+            } else if (pp2pos > pp1pos) {
+              break;
+            }
+            pp2pos = popNextOrNull(pp2poses);
+          }
+
+          while (!pp2posList.isEmpty() && Math.abs(pp2posList.peekFirst() - pp1pos) > k) {
+            pp2posList.removeFirst();
+          }
+
+          for (Integer pp2posElement : pp2posList) {
+            answer.add(new AnswerElement(pp1.docID, pp1pos, pp2posElement));
+          }
+          pp1pos = popNextOrNull(pp1poses);
+        }
+
+        pp1 = popNextOrNull(p1);
+        pp2 = popNextOrNull(p2);
+      } else if (pp1.docID < pp2.docID) {
+          pp1 = popNextOrNull(p1);
+      } else {
+          pp2 = popNextOrNull(p2);
+      }
+
+    }
+
+    return answer;
+  }
 
   /** Find proximity matches where the two words are within k words in the two postings lists.
    *  Returns a List of (document, position_of_p1_word, position_of_p2_word) items.
    */
   static List<AnswerElement> positionalIntersect(Iterator<Posting> p1, Iterator<Posting> p2, int k) {
-    List<AnswerElement> answer = new ArrayList<>();
-    Posting p1posting = popNextOrNull(p1);
-    Posting p2posting = popNextOrNull(p2);
-
     // WRITE THE ALGORITHM HERE!
-
-    return answer;
+    return intersectAdvanced(p1, p2, k);
   }
 
 
